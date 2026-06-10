@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.backends._legacy:_Backend"
+
+[project]
+name = "cn-fc-eval"
+version = "0.1.0"
+description = "Chinese Function Calling Evaluation — 中文 Agent Function Calling 评估集"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "fafa", email = "fafaismygod@github.com"},
+]
+keywords = [
+    "function-calling", "llm", "evaluation", "benchmark",
+    "chinese", "agent", "tool-use",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+requires-python = ">=3.10"
+dependencies = [
+    "openai>=1.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/fafaismygod/cn-fc-eval"
+Repository = "https://github.com/fafaismygod/cn-fc-eval"
+
+[tool.setuptools.packages.find]
+include = ["cn_fc_eval*"]
+
+[tool.setuptools.package-data]
+cn_fc_eval = ["test_cases.json"]

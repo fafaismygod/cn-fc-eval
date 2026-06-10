@@ -1,0 +1,3997 @@
+{
+  "meta": {
+    "name": "Chinese Function Calling Evaluation (CN-FC-Eval)",
+    "version": "0.1.0",
+    "description": "100 个中文 Agent Function Calling 测试用例，覆盖 5 类场景",
+    "categories": {
+      "simple": "简单调用 — 单一工具、参数明确",
+      "multi_step": "多步调用 — 需先查后算、先后依赖",
+      "parallel": "并行调用 — 多个独立调用同时进行",
+      "nested": "嵌套参数 — 复杂 JSON 嵌套结构",
+      "tool_selection": "工具选择推理 — 多工具中选出正确的"
+    },
+    "total_cases": 100
+  },
+  "test_cases": [
+    {
+      "id": "simple-001",
+      "category": "simple",
+      "query": "帮我查一下北京的天气",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "get_weather",
+            "description": "查询指定城市的实时天气信息，包括温度、湿度、风力等",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "city": {"type": "string", "description": "城市名称，如北京、上海"}
+              },
+              "required": ["city"]
+            }
+          }
+        }
+      ],
+      "expected": {"name": "get_weather", "arguments": {"city": "北京"}}
+    },
+    {
+      "id": "simple-002",
+      "category": "simple",
+      "query": "给张三发一条短信，内容是'明天开会别忘了'",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "send_sms",
+            "description": "发送短信到指定手机号或联系人",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "recipient": {"type": "string", "description": "收件人姓名或手机号"},
+                "content": {"type": "string", "description": "短信内容"}
+              },
+              "required": ["recipient", "content"]
+            }
+          }
+        }
+      ],
+      "expected": {"name": "send_sms", "arguments": {"recipient": "张三", "content": "明天开会别忘了"}}
+    },
+    {
+      "id": "simple-003",
+      "category": "simple",
+      "query": "计算 123 乘以 456 等于多少",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "calculate",
+            "description": "执行数学计算，支持加减乘除、幂运算等",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "expression": {"type": "string", "description": "数学表达式，如 '3*4+2'"}
+              },
+              "required": ["expression"]
+            }
+          }
+        }
+      ],
+      "expected": {"name": "calculate", "arguments": {"expression": "123*456"}}
+    },
+    {
+      "id": "simple-004",
+      "category": "simple",
+      "query": "把'Hello, how are you?'翻译成中文",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "translate",
+            "description": "将文本翻译成指定语言",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "text": {"type": "string", "description": "待翻译文本"},
+                "target_language": {"type": "string", "description": "目标语言，如中文、英文、日文"}
+              },
+              "required": ["text", "target_language"]
+            }
+          }
+        }
+      ],
+      "expected": {"name": "translate", "arguments": {"text": "Hello, how are you?", "target_language": "中文"}}
+    },
+    {
+      "id": "simple-005",
+      "category": "simple",
+      "query": "搜一下最近有什么好看的科幻电影",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "search_movies",
+            "description": "搜索电影信息，可按类型、年份、评分等筛选",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "genre": {"type": "string", "description": "电影类型"},
+                "year": {"type": "integer", "description": "发行年份"},
+                "min_rating": {"type": "number", "description": "最低评分"}
+              }
+            }
+          }
+        }
+      ],
+      "expected": {"name": "search_movies", "arguments": {"genre": "科幻"}}
+    },
+    {
+      "id": "simple-006",
+      "category": "simple",
+      "query": "帮我设一个明天早上7点的闹钟",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "set_alarm",
+            "description": "设置闹钟",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "time": {"type": "string", "description": "闹钟时间，格式 HH:MM"},
+                "date": {"type": "string", "description": "日期，格式 YYYY-MM-DD 或 '今天'/'明天'"},
+                "label": {"type": "string", "description": "闹钟标签"}
+              },
+              "required": ["time"]
+            }
+          }
+        }
+      ],
+      "expected": {"name": "set_alarm", "arguments": {"time": "07:00", "date": "明天"}}
+    },
+    {
+      "id": "simple-007",
+      "category": "simple",
+      "query": "删除我购物车里的那个蓝牙耳机",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "remove_from_cart",
+            "description": "从购物车中删除指定商品",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "product_name": {"type": "string", "description": "商品名称，支持模糊匹配"},
+                "product_id": {"type": "string", "description": "商品ID，精确匹配"}
+              }
+            }
+          }
+        }
+      ],
+      "expected": {"name": "remove_from_cart", "arguments": {"product_name": "蓝牙耳机"}}
+    },
+    {
+      "id": "simple-008",
+      "category": "simple",
+      "query": "帮我查一下我的中国银行账户余额",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "get_account_balance",
+            "description": "查询指定银行账户的余额",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "bank_name": {"type": "string", "description": "银行名称"},
+                "account_type": {"type": "string", "enum": ["储蓄卡", "信用卡", "全部"]}
+              },
+              "required": ["bank_name"]
+            }
+          }
+        }
+      ],
+      "expected": {"name": "get_account_balance", "arguments": {"bank_name": "中国银行"}}
+    },
+    {
+      "id": "simple-009",
+      "category": "simple",
+      "query": "帮我预订明天从北京到上海的高铁票",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "book_train_ticket",
+            "description": "预订火车票",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "departure": {"type": "string", "description": "出发城市"},
+                "destination": {"type": "string", "description": "目的城市"},
+                "date": {"type": "string", "description": "出发日期 YYYY-MM-DD"},
+                "train_type": {"type": "string", "enum": ["高铁", "动车", "普速", "任意"]}
+              },
+              "required": ["departure", "destination", "date"]
+            }
+          }
+        }
+      ],
+      "expected": {"name": "book_train_ticket", "arguments": {"departure": "北京", "destination": "上海", "date": "明天", "train_type": "高铁"}}
+    },
+    {
+      "id": "simple-010",
+      "category": "simple",
+      "query": "记录一笔支出：在星巴克花了 38 块买咖啡",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "add_expense",
+            "description": "记录一笔支出",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "amount": {"type": "number", "description": "金额（元）"},
+                "category": {"type": "string", "description": "支出类别"},
+                "merchant": {"type": "string", "description": "商户名称"},
+                "note": {"type": "string", "description": "备注"}
+              },
+              "required": ["amount"]
+            }
+          }
+        }
+      ],
+      "expected": {"name": "add_expense", "arguments": {"amount": 38, "merchant": "星巴克", "category": "咖啡", "note": "买咖啡"}}
+    },
+    {
+      "id": "simple-011",
+      "category": "simple",
+      "query": "把客厅的灯关掉",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "control_light",
+            "description": "控制智能灯具的开关和亮度",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "room": {"type": "string", "description": "房间名称"},
+                "action": {"type": "string", "enum": ["开", "关", "调亮", "调暗"]},
+                "brightness": {"type": "integer", "minimum": 0, "maximum": 100}
+              },
+              "required": ["room", "action"]
+            }
+          }
+        }
+      ],
+      "expected": {"name": "control_light", "arguments": {"room": "客厅", "action": "关"}}
+    },
+    {
+      "id": "simple-012",
+      "category": "simple",
+      "query": "播放周杰伦的稻香",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "play_music",
+            "description": "播放音乐",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "artist": {"type": "string", "description": "歌手名称"},
+                "song": {"type": "string", "description": "歌曲名称"},
+                "source": {"type": "string", "enum": ["网易云", "QQ音乐", "任意"]}
+              },
+              "required": ["song"]
+            }
+          }
+        }
+      ],
+      "expected": {"name": "play_music", "arguments": {"artist": "周杰伦", "song": "稻香"}}
+    },
+    {
+      "id": "simple-013",
+      "category": "simple",
+      "query": "帮我把这段文字转成语音读出来：欢迎来到深圳",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "text_to_speech",
+            "description": "将文字转换为语音",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "text": {"type": "string", "description": "要朗读的文字"},
+                "voice": {"type": "string", "enum": ["男声", "女声"], "description": "语音类型"}
+              },
+              "required": ["text"]
+            }
+          }
+        }
+      ],
+      "expected": {"name": "text_to_speech", "arguments": {"text": "欢迎来到深圳"}}
+    },
+    {
+      "id": "simple-014",
+      "category": "simple",
+      "query": "查一下快递单号 SF1234567890 到哪了",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "track_package",
+            "description": "查询快递物流信息",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "tracking_number": {"type": "string", "description": "快递单号"},
+                "carrier": {"type": "string", "description": "快递公司，如顺丰、中通、圆通"}
+              },
+              "required": ["tracking_number"]
+            }
+          }
+        }
+      ],
+      "expected": {"name": "track_package", "arguments": {"tracking_number": "SF1234567890"}}
+    },
+    {
+      "id": "simple-015",
+      "category": "simple",
+      "query": "帮我创建一个明天下午3点的会议，主题是项目评审",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "create_meeting",
+            "description": "创建日历会议",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "title": {"type": "string", "description": "会议主题"},
+                "datetime": {"type": "string", "description": "会议时间"},
+                "duration_minutes": {"type": "integer", "description": "会议时长（分钟）"}
+              },
+              "required": ["title", "datetime"]
+            }
+          }
+        }
+      ],
+      "expected": {"name": "create_meeting", "arguments": {"title": "项目评审", "datetime": "明天 15:00"}}
+    },
+    {
+      "id": "simple-016",
+      "category": "simple",
+      "query": "这个图片里写了什么字？http://example.com/menu.jpg",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "ocr_image",
+            "description": "识别图片中的文字（OCR）",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "image_url": {"type": "string", "description": "图片URL"},
+                "language": {"type": "string", "description": "文字语言"}
+              },
+              "required": ["image_url"]
+            }
+          }
+        }
+      ],
+      "expected": {"name": "ocr_image", "arguments": {"image_url": "http://example.com/menu.jpg"}}
+    },
+    {
+      "id": "simple-017",
+      "category": "simple",
+      "query": "把空调调到 26 度",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "set_thermostat",
+            "description": "设置空调/恒温器温度",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "temperature": {"type": "integer", "description": "目标温度（摄氏度）"},
+                "mode": {"type": "string", "enum": ["制冷", "制热", "除湿", "送风"]},
+                "room": {"type": "string", "description": "房间名称，不指定则设置全屋"}
+              },
+              "required": ["temperature"]
+            }
+          }
+        }
+      ],
+      "expected": {"name": "set_thermostat", "arguments": {"temperature": 26}}
+    },
+    {
+      "id": "simple-018",
+      "category": "simple",
+      "query": "附近有什么好吃的川菜馆",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "search_restaurants",
+            "description": "搜索附近餐厅",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "cuisine": {"type": "string", "description": "菜系类型"},
+                "radius_km": {"type": "integer", "description": "搜索半径（公里），默认3"},
+                "min_rating": {"type": "number", "description": "最低评分"}
+              },
+              "required": ["cuisine"]
+            }
+          }
+        }
+      ],
+      "expected": {"name": "search_restaurants", "arguments": {"cuisine": "川菜"}}
+    },
+    {
+      "id": "simple-019",
+      "category": "simple",
+      "query": "给我导航到首都机场T3航站楼",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "navigate",
+            "description": "导航到指定目的地",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "destination": {"type": "string", "description": "目的地地址或地标名称"},
+                "mode": {"type": "string", "enum": ["驾车", "公交", "步行", "骑行"]}
+              },
+              "required": ["destination"]
+            }
+          }
+        }
+      ],
+      "expected": {"name": "navigate", "arguments": {"destination": "首都机场T3航站楼"}}
+    },
+    {
+      "id": "simple-020",
+      "category": "simple",
+      "query": "麻烦您帮我查一下李四的联系方式",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "lookup_contact",
+            "description": "在通讯录中查找联系人信息",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "name": {"type": "string", "description": "联系人姓名"},
+                "fields": {"type": "array", "items": {"type": "string", "enum": ["电话", "邮箱", "地址", "公司"]}}
+              },
+              "required": ["name"]
+            }
+          }
+        }
+      ],
+      "expected": {"name": "lookup_contact", "arguments": {"name": "李四"}}
+    },
+
+    {
+      "id": "multi-001",
+      "category": "multi_step",
+      "query": "帮我查一下北京今天天气，如果下雨就提醒我带伞",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "get_weather",
+            "description": "查询指定城市的实时天气信息",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "city": {"type": "string", "description": "城市名称"}
+              },
+              "required": ["city"]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "send_reminder",
+            "description": "发送一条提醒消息给用户",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "message": {"type": "string", "description": "提醒内容"},
+                "priority": {"type": "string", "enum": ["高", "中", "低"]}
+              },
+              "required": ["message"]
+            }
+          }
+        }
+      ],
+      "expected": [
+        {"name": "get_weather", "arguments": {"city": "北京"}}
+      ],
+      "expected_type": "multi_step_conditional"
+    },
+    {
+      "id": "multi-002",
+      "category": "multi_step",
+      "query": "先搜一下附近500米内的咖啡店，然后帮我导航到最近的那家",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "search_places",
+            "description": "搜索附近地点",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "keyword": {"type": "string", "description": "搜索关键词"},
+                "radius_meters": {"type": "integer", "description": "搜索半径（米）"}
+              },
+              "required": ["keyword"]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "navigate",
+            "description": "导航到指定目的地",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "destination": {"type": "string", "description": "目的地"}
+              },
+              "required": ["destination"]
+            }
+          }
+        }
+      ],
+      "expected": [
+        {"name": "search_places", "arguments": {"keyword": "咖啡店", "radius_meters": 500}}
+      ],
+      "expected_type": "multi_step_sequential"
+    },
+    {
+      "id": "multi-003",
+      "category": "multi_step",
+      "query": "帮我查一下账户余额，如果少于 100 块就从储蓄卡转 500 进去",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "get_account_balance",
+            "description": "查询账户余额",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "account_type": {"type": "string", "enum": ["储蓄卡", "信用卡", "零钱"]}
+              },
+              "required": ["account_type"]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "transfer_money",
+            "description": "在账户之间转账",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "from_account": {"type": "string", "description": "转出账户"},
+                "to_account": {"type": "string", "description": "转入账户"},
+                "amount": {"type": "number", "description": "转账金额"}
+              },
+              "required": ["from_account", "to_account", "amount"]
+            }
+          }
+        }
+      ],
+      "expected": [
+        {"name": "get_account_balance", "arguments": {"account_type": "零钱"}}
+      ],
+      "expected_type": "multi_step_conditional"
+    },
+    {
+      "id": "multi-004",
+      "category": "multi_step",
+      "query": "帮我查一下张三的最新订单，然后取消它",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "get_orders",
+            "description": "查询用户的订单列表",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "username": {"type": "string", "description": "用户名"},
+                "limit": {"type": "integer", "description": "返回订单数量"}
+              },
+              "required": ["username"]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "cancel_order",
+            "description": "取消指定订单",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "order_id": {"type": "string", "description": "订单ID"}
+              },
+              "required": ["order_id"]
+            }
+          }
+        }
+      ],
+      "expected": [
+        {"name": "get_orders", "arguments": {"username": "张三", "limit": 1}}
+      ],
+      "expected_type": "multi_step_sequential"
+    },
+    {
+      "id": "multi-005",
+      "category": "multi_step",
+      "query": "搜一下北京飞上海的航班，选最便宜的那个帮我订",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "search_flights",
+            "description": "搜索航班信息",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "departure": {"type": "string", "description": "出发城市"},
+                "destination": {"type": "string", "description": "目的城市"},
+                "date": {"type": "string", "description": "出发日期"}
+              },
+              "required": ["departure", "destination"]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "book_flight",
+            "description": "预订机票",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "flight_id": {"type": "string", "description": "航班ID"},
+                "passenger_name": {"type": "string", "description": "乘客姓名"}
+              },
+              "required": ["flight_id", "passenger_name"]
+            }
+          }
+        }
+      ],
+      "expected": [
+        {"name": "search_flights", "arguments": {"departure": "北京", "destination": "上海"}}
+      ],
+      "expected_type": "multi_step_sequential"
+    },
+    {
+      "id": "multi-006",
+      "category": "multi_step",
+      "query": "先查一下这个快递SF1234567890到哪了，如果已经签收了就帮我确认收货",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "track_package",
+            "description": "查询快递物流信息",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "tracking_number": {"type": "string", "description": "快递单号"}
+              },
+              "required": ["tracking_number"]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "confirm_delivery",
+            "description": "确认收货",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "order_id": {"type": "string", "description": "订单ID"},
+                "tracking_number": {"type": "string", "description": "关联的快递单号"}
+              },
+              "required": ["order_id"]
+            }
+          }
+        }
+      ],
+      "expected": [
+        {"name": "track_package", "arguments": {"tracking_number": "SF1234567890"}}
+      ],
+      "expected_type": "multi_step_conditional"
+    },
+    {
+      "id": "multi-007",
+      "category": "multi_step",
+      "query": "帮我查一下今天有没有新的邮件，有的话帮我总结一下发件人和主题",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "check_new_emails",
+            "description": "检查未读邮件",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "folder": {"type": "string", "description": "邮件文件夹"},
+                "limit": {"type": "integer", "description": "最多返回几封"}
+              }
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "summarize_emails",
+            "description": "总结邮件列表的关键信息",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "email_ids": {"type": "array", "items": {"type": "string"}, "description": "邮件ID列表"}
+              },
+              "required": ["email_ids"]
+            }
+          }
+        }
+      ],
+      "expected": [
+        {"name": "check_new_emails", "arguments": {}}
+      ],
+      "expected_type": "multi_step_sequential"
+    },
+    {
+      "id": "multi-008",
+      "category": "multi_step",
+      "query": "搜一下上海浦东附近的酒店，选评分 4.5 以上的，帮我预订评分最高的那家，住 3 晚",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "search_hotels",
+            "description": "搜索酒店",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "location": {"type": "string", "description": "地点或地标"},
+                "min_rating": {"type": "number", "description": "最低评分"},
+                "check_in": {"type": "string", "description": "入住日期"},
+                "nights": {"type": "integer", "description": "入住晚数"}
+              }
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "book_hotel",
+            "description": "预订酒店房间",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "hotel_id": {"type": "string", "description": "酒店ID"},
+                "room_type": {"type": "string", "description": "房型"},
+                "check_in": {"type": "string", "description": "入住日期"},
+                "nights": {"type": "integer", "description": "入住晚数"}
+              },
+              "required": ["hotel_id", "check_in", "nights"]
+            }
+          }
+        }
+      ],
+      "expected": [
+        {"name": "search_hotels", "arguments": {"location": "上海浦东", "min_rating": 4.5}}
+      ],
+      "expected_type": "multi_step_sequential"
+    },
+    {
+      "id": "multi-009",
+      "category": "multi_step",
+      "query": "帮我查一下这个用户在数据库里存不存在，如果存在就导出一份他的行为数据报告",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "check_user_exists",
+            "description": "检查用户是否存在于数据库中",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "user_id": {"type": "string", "description": "用户ID或手机号"}
+              },
+              "required": ["user_id"]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "export_user_report",
+            "description": "导出用户行为数据报告",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "user_id": {"type": "string", "description": "用户ID"},
+                "date_range": {"type": "string", "description": "时间范围，如'最近7天'"}
+              },
+              "required": ["user_id", "date_range"]
+            }
+          }
+        }
+      ],
+      "expected": [
+        {"name": "check_user_exists", "arguments": {"user_id": "这个用户"}}
+      ],
+      "expected_type": "multi_step_conditional"
+    },
+    {
+      "id": "multi-010",
+      "category": "multi_step",
+      "query": "帮我看一下今天日程有什么，然后把第一个会议推迟半小时",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "get_schedule",
+            "description": "查询指定日期的日程安排",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "date": {"type": "string", "description": "日期，格式 YYYY-MM-DD 或 '今天'/'明天'"}
+              },
+              "required": ["date"]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "reschedule_event",
+            "description": "修改日程时间",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "event_id": {"type": "string", "description": "日程ID"},
+                "new_time": {"type": "string", "description": "新时间"},
+                "offset_minutes": {"type": "integer", "description": "时间偏移（分钟），正数为推迟"}
+              },
+              "required": ["event_id", "offset_minutes"]
+            }
+          }
+        }
+      ],
+      "expected": [
+        {"name": "get_schedule", "arguments": {"date": "今天"}}
+      ],
+      "expected_type": "multi_step_sequential"
+    },
+    {
+      "id": "multi-011",
+      "category": "multi_step",
+      "query": "查一下这周的天气预报，挑天气最好的一天帮我在那天的下午安排一个户外烧烤",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "get_weekly_forecast",
+            "description": "查询一周天气预报",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "city": {"type": "string", "description": "城市名称"}
+              },
+              "required": ["city"]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "create_event",
+            "description": "创建活动/日程",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "title": {"type": "string", "description": "活动名称"},
+                "date": {"type": "string", "description": "活动日期"},
+                "time": {"type": "string", "description": "活动时间"},
+                "location": {"type": "string", "description": "地点"}
+              },
+              "required": ["title", "date"]
+            }
+          }
+        }
+      ],
+      "expected": [
+        {"name": "get_weekly_forecast", "arguments": {"city": "北京"}}
+      ],
+      "expected_type": "multi_step_conditional"
+    },
+    {
+      "id": "multi-012",
+      "category": "multi_step",
+      "query": "搜一下有什么好看的日剧，然后帮我记录到我的追剧清单里",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "search_tv_shows",
+            "description": "搜索电视剧/综艺节目",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "genre": {"type": "string", "description": "类型/地区"},
+                "min_rating": {"type": "number", "description": "最低评分"}
+              }
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "add_to_watchlist",
+            "description": "添加到追剧/观看清单",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "items": {"type": "array", "items": {"type": "string"}, "description": "要添加的剧名列表"},
+                "list_name": {"type": "string", "description": "清单名称"}
+              },
+              "required": ["items"]
+            }
+          }
+        }
+      ],
+      "expected": [
+        {"name": "search_tv_shows", "arguments": {"genre": "日剧"}}
+      ],
+      "expected_type": "multi_step_sequential"
+    },
+    {
+      "id": "multi-013",
+      "category": "multi_step",
+      "query": "帮我查一下苹果公司的股票价格，如果涨了超过5%就提醒我卖出",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "get_stock_price",
+            "description": "查询股票当前价格和涨跌幅",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "symbol": {"type": "string", "description": "股票代码或公司名称"},
+                "period": {"type": "string", "enum": ["实时", "日K", "周K"]}
+              },
+              "required": ["symbol"]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "send_alert",
+            "description": "发送交易提醒",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "stock_symbol": {"type": "string", "description": "股票代码"},
+                "action": {"type": "string", "enum": ["买入", "卖出", "观望"]},
+                "reason": {"type": "string", "description": "提醒原因"}
+              },
+              "required": ["stock_symbol", "action"]
+            }
+          }
+        }
+      ],
+      "expected": [
+        {"name": "get_stock_price", "arguments": {"symbol": "苹果公司"}}
+      ],
+      "expected_type": "multi_step_conditional"
+    },
+    {
+      "id": "multi-014",
+      "category": "multi_step",
+      "query": "先读一下这篇技术博客的内容 http://example.com/ai-trends，然后生成一个 100 字的中文摘要",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "fetch_webpage",
+            "description": "获取网页内容",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "url": {"type": "string", "description": "网页URL"},
+                "extract_text": {"type": "boolean", "description": "是否只提取正文"}
+              },
+              "required": ["url"]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "summarize_text",
+            "description": "对文本进行摘要",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "text": {"type": "string", "description": "待摘要的文本"},
+                "max_length": {"type": "integer", "description": "摘要最大字数"},
+                "language": {"type": "string", "description": "摘要语言"}
+              },
+              "required": ["text", "max_length"]
+            }
+          }
+        }
+      ],
+      "expected": [
+        {"name": "fetch_webpage", "arguments": {"url": "http://example.com/ai-trends"}}
+      ],
+      "expected_type": "multi_step_sequential"
+    },
+    {
+      "id": "multi-015",
+      "category": "multi_step",
+      "query": "看看我微信钱包还有多少钱，够 200 的话就帮我在京东下单那个小米充电宝",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "get_wallet_balance",
+            "description": "查询电子钱包余额",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "wallet_type": {"type": "string", "enum": ["微信", "支付宝", "银行卡"]}
+              },
+              "required": ["wallet_type"]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "place_order",
+            "description": "在电商平台下单购买商品",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "platform": {"type": "string", "description": "电商平台"},
+                "product_name": {"type": "string", "description": "商品名称"},
+                "quantity": {"type": "integer", "default": 1}
+              },
+              "required": ["platform", "product_name"]
+            }
+          }
+        }
+      ],
+      "expected": [
+        {"name": "get_wallet_balance", "arguments": {"wallet_type": "微信"}}
+      ],
+      "expected_type": "multi_step_conditional"
+    },
+    {
+      "id": "multi-016",
+      "category": "multi_step",
+      "query": "帮我搜一下'深度学习入门'这本书，看看豆瓣评分多少，如果高于 8 分就帮我加到购物车",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "search_books",
+            "description": "搜索图书信息",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "title": {"type": "string", "description": "书名或关键词"},
+                "source": {"type": "string", "enum": ["豆瓣", "京东", "当当"]}
+              },
+              "required": ["title"]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "add_to_cart",
+            "description": "将商品添加到购物车",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "product_id": {"type": "string", "description": "商品ID"},
+                "quantity": {"type": "integer", "default": 1}
+              },
+              "required": ["product_id"]
+            }
+          }
+        }
+      ],
+      "expected": [
+        {"name": "search_books", "arguments": {"title": "深度学习入门", "source": "豆瓣"}}
+      ],
+      "expected_type": "multi_step_conditional"
+    },
+    {
+      "id": "multi-017",
+      "category": "multi_step",
+      "query": "帮我查一下今天有没有限行，如果有的话帮我叫一辆滴滴去公司",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "check_traffic_restriction",
+            "description": "查询城市限行信息",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "city": {"type": "string", "description": "城市名称"},
+                "date": {"type": "string", "description": "日期"}
+              },
+              "required": ["city"]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "hail_ride",
+            "description": "叫车/打车",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "platform": {"type": "string", "enum": ["滴滴", "高德", "曹操"]},
+                "destination": {"type": "string", "description": "目的地"},
+                "pickup_time": {"type": "string", "description": "用车时间"}
+              },
+              "required": ["destination"]
+            }
+          }
+        }
+      ],
+      "expected": [
+        {"name": "check_traffic_restriction", "arguments": {"city": "北京"}}
+      ],
+      "expected_type": "multi_step_conditional"
+    },
+    {
+      "id": "multi-018",
+      "category": "multi_step",
+      "query": "先算一下我本月总支出是多少，然后按类别画个饼图看看钱都花哪了",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "get_monthly_expenses",
+            "description": "查询月度支出明细",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "month": {"type": "string", "description": "月份，如'2026-06'"},
+                "group_by": {"type": "string", "description": "分组维度，如'类别'"}
+              }
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "create_chart",
+            "description": "根据数据生成图表",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "chart_type": {"type": "string", "enum": ["饼图", "柱状图", "折线图"]},
+                "data": {"type": "object", "description": "图表数据"},
+                "title": {"type": "string", "description": "图表标题"}
+              },
+              "required": ["chart_type", "data"]
+            }
+          }
+        }
+      ],
+      "expected": [
+        {"name": "get_monthly_expenses", "arguments": {"month": "2026-06", "group_by": "类别"}}
+      ],
+      "expected_type": "multi_step_sequential"
+    },
+    {
+      "id": "multi-019",
+      "category": "multi_step",
+      "query": "搜一下北京最近的 AI 相关的技术讲座，如果有这周末的就帮我报名",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "search_events",
+            "description": "搜索活动/讲座信息",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "keyword": {"type": "string", "description": "搜索关键词"},
+                "city": {"type": "string", "description": "城市"},
+                "date_range": {"type": "string", "description": "时间范围"}
+              },
+              "required": ["keyword", "city"]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "register_event",
+            "description": "报名参加活动",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "event_id": {"type": "string", "description": "活动ID"},
+                "attendee_name": {"type": "string", "description": "参加者姓名"},
+                "ticket_type": {"type": "string", "enum": ["免费", "付费", "VIP"]}
+              },
+              "required": ["event_id", "attendee_name"]
+            }
+          }
+        }
+      ],
+      "expected": [
+        {"name": "search_events", "arguments": {"keyword": "AI", "city": "北京"}}
+      ],
+      "expected_type": "multi_step_sequential"
+    },
+    {
+      "id": "multi-020",
+      "category": "multi_step",
+      "query": "帮我看看今天有什么热门新闻，挑三条最重要的推送给我",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "get_trending_news",
+            "description": "获取热门新闻/热搜",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "source": {"type": "string", "enum": ["微博", "知乎", "百度"]},
+                "limit": {"type": "integer", "description": "返回条数"},
+                "category": {"type": "string", "description": "新闻分类"}
+              }
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "push_notification",
+            "description": "推送通知给用户",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "title": {"type": "string", "description": "通知标题"},
+                "content": {"type": "string", "description": "通知内容"},
+                "items": {"type": "array", "items": {"type": "string"}, "description": "多条内容"}
+              },
+              "required": ["title", "content"]
+            }
+          }
+        }
+      ],
+      "expected": [
+        {"name": "get_trending_news", "arguments": {"limit": 10}}
+      ],
+      "expected_type": "multi_step_sequential"
+    },
+
+    {
+      "id": "parallel-001",
+      "category": "parallel",
+      "query": "同时查一下北京、上海、广州三个城市的天气",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "get_weather",
+            "description": "查询指定城市的实时天气信息",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "city": {"type": "string", "description": "城市名称"}
+              },
+              "required": ["city"]
+            }
+          }
+        }
+      ],
+      "expected": [
+        {"name": "get_weather", "arguments": {"city": "北京"}},
+        {"name": "get_weather", "arguments": {"city": "上海"}},
+        {"name": "get_weather", "arguments": {"city": "广州"}}
+      ],
+      "expected_type": "parallel"
+    },
+    {
+      "id": "parallel-002",
+      "category": "parallel",
+      "query": "帮我在百度、谷歌、必应上都搜一下'AI Agent 2026'",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "web_search",
+            "description": "在搜索引擎上搜索",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "query": {"type": "string", "description": "搜索关键词"},
+                "engine": {"type": "string", "enum": ["百度", "谷歌", "必应"]}
+              },
+              "required": ["query", "engine"]
+            }
+          }
+        }
+      ],
+      "expected": [
+        {"name": "web_search", "arguments": {"query": "AI Agent 2026", "engine": "百度"}},
+        {"name": "web_search", "arguments": {"query": "AI Agent 2026", "engine": "谷歌"}},
+        {"name": "web_search", "arguments": {"query": "AI Agent 2026", "engine": "必应"}}
+      ],
+      "expected_type": "parallel"
+    },
+    {
+      "id": "parallel-003",
+      "category": "parallel",
+      "query": "把客厅的灯关了，把卧室的空调调到24度，把窗帘拉上",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "control_light",
+            "description": "控制智能灯具",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "room": {"type": "string", "description": "房间名称"},
+                "action": {"type": "string", "enum": ["开", "关"]}
+              },
+              "required": ["room", "action"]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "set_thermostat",
+            "description": "设置空调温度",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "temperature": {"type": "integer", "description": "目标温度"},
+                "room": {"type": "string", "description": "房间名称"}
+              },
+              "required": ["temperature", "room"]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "control_curtain",
+            "description": "控制智能窗帘",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "room": {"type": "string", "description": "房间名称"},
+                "action": {"type": "string", "enum": ["拉开", "拉上"]}
+              },
+              "required": ["room", "action"]
+            }
+          }
+        }
+      ],
+      "expected": [
+        {"name": "control_light", "arguments": {"room": "客厅", "action": "关"}},
+        {"name": "set_thermostat", "arguments": {"temperature": 24, "room": "卧室"}},
+        {"name": "control_curtain", "arguments": {"room": "全屋", "action": "拉上"}}
+      ],
+      "expected_type": "parallel"
+    },
+    {
+      "id": "parallel-004",
+      "category": "parallel",
+      "query": "帮我把 a.txt、b.txt、c.txt 这三个文件都删掉",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "delete_file",
+            "description": "删除指定文件",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "filename": {"type": "string", "description": "文件名或路径"},
+                "recursive": {"type": "boolean", "description": "是否递归删除"}
+              },
+              "required": ["filename"]
+            }
+          }
+        }
+      ],
+      "expected": [
+        {"name": "delete_file", "arguments": {"filename": "a.txt"}},
+        {"name": "delete_file", "arguments": {"filename": "b.txt"}},
+        {"name": "delete_file", "arguments": {"filename": "c.txt"}}
+      ],
+      "expected_type": "parallel"
+    },
+    {
+      "id": "parallel-005",
+      "category": "parallel",
+      "query": "同时查一下阿里、腾讯、字节、美团这四家公司的股价",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "get_stock_price",
+            "description": "查询股票实时价格",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "symbol": {"type": "string", "description": "股票代码或公司名称"}
+              },
+              "required": ["symbol"]
+            }
+          }
+        }
+      ],
+      "expected": [
+        {"name": "get_stock_price", "arguments": {"symbol": "阿里巴巴"}},
+        {"name": "get_stock_price", "arguments": {"symbol": "腾讯"}},
+        {"name": "get_stock_price", "arguments": {"symbol": "字节跳动"}},
+        {"name": "get_stock_price", "arguments": {"symbol": "美团"}}
+      ],
+      "expected_type": "parallel"
+    },
+    {
+      "id": "parallel-006",
+      "category": "parallel",
+      "query": "帮我在微信上给张三发个消息，在钉钉上给李四发个消息，在飞书上给王五发个消息",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "send_message",
+            "description": "通过即时通讯工具发送消息",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "platform": {"type": "string", "enum": ["微信", "钉钉", "飞书", "QQ"]},
+                "recipient": {"type": "string", "description": "收件人姓名"},
+                "content": {"type": "string", "description": "消息内容"}
+              },
+              "required": ["platform", "recipient", "content"]
+            }
+          }
+        }
+      ],
+      "expected": [
+        {"name": "send_message", "arguments": {"platform": "微信", "recipient": "张三", "content": "消息"}},
+        {"name": "send_message", "arguments": {"platform": "钉钉", "recipient": "李四", "content": "消息"}},
+        {"name": "send_message", "arguments": {"platform": "飞书", "recipient": "王五", "content": "消息"}}
+      ],
+      "expected_type": "parallel"
+    },
+    {
+      "id": "parallel-007",
+      "category": "parallel",
+      "query": "帮我把这三张图片都识别一下文字：img1.jpg、img2.jpg、img3.jpg",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "ocr_image",
+            "description": "识别图片文字",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "image_url": {"type": "string", "description": "图片URL或路径"}
+              },
+              "required": ["image_url"]
+            }
+          }
+        }
+      ],
+      "expected": [
+        {"name": "ocr_image", "arguments": {"image_url": "img1.jpg"}},
+        {"name": "ocr_image", "arguments": {"image_url": "img2.jpg"}},
+        {"name": "ocr_image", "arguments": {"image_url": "img3.jpg"}}
+      ],
+      "expected_type": "parallel"
+    },
+    {
+      "id": "parallel-008",
+      "category": "parallel",
+      "query": "查一下我的中国银行、工商银行、建设银行三个账户的余额",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "get_account_balance",
+            "description": "查询银行账户余额",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "bank_name": {"type": "string", "description": "银行名称"},
+                "account_type": {"type": "string", "enum": ["储蓄卡", "信用卡", "全部"]}
+              },
+              "required": ["bank_name"]
+            }
+          }
+        }
+      ],
+      "expected": [
+        {"name": "get_account_balance", "arguments": {"bank_name": "中国银行"}},
+        {"name": "get_account_balance", "arguments": {"bank_name": "工商银行"}},
+        {"name": "get_account_balance", "arguments": {"bank_name": "建设银行"}}
+      ],
+      "expected_type": "parallel"
+    },
+    {
+      "id": "parallel-009",
+      "category": "parallel",
+      "query": "把这三篇文章都翻译成英文：关于AI发展的思考、数字化转型的挑战、区块链技术综述",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "translate",
+            "description": "翻译文本",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "text": {"type": "string", "description": "待翻译文本"},
+                "target_language": {"type": "string", "description": "目标语言"}
+              },
+              "required": ["text", "target_language"]
+            }
+          }
+        }
+      ],
+      "expected": [
+        {"name": "translate", "arguments": {"text": "关于AI发展的思考", "target_language": "英文"}},
+        {"name": "translate", "arguments": {"text": "数字化转型的挑战", "target_language": "英文"}},
+        {"name": "translate", "arguments": {"text": "区块链技术综述", "target_language": "英文"}}
+      ],
+      "expected_type": "parallel"
+    },
+    {
+      "id": "parallel-010",
+      "category": "parallel",
+      "query": "帮我在百度地图上查一下从家到公司开车要多久，同时在高德地图上也查一下",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "estimate_travel_time",
+            "description": "估算两点之间的通行时间",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "origin": {"type": "string", "description": "起点"},
+                "destination": {"type": "string", "description": "终点"},
+                "mode": {"type": "string", "enum": ["驾车", "公交", "步行", "骑行"]},
+                "map_service": {"type": "string", "enum": ["百度地图", "高德地图", "腾讯地图"]}
+              },
+              "required": ["origin", "destination", "mode", "map_service"]
+            }
+          }
+        }
+      ],
+      "expected": [
+        {"name": "estimate_travel_time", "arguments": {"origin": "家", "destination": "公司", "mode": "驾车", "map_service": "百度地图"}},
+        {"name": "estimate_travel_time", "arguments": {"origin": "家", "destination": "公司", "mode": "驾车", "map_service": "高德地图"}}
+      ],
+      "expected_type": "parallel"
+    },
+    {
+      "id": "parallel-011",
+      "category": "parallel",
+      "query": "帮我把这三个压缩包都解压了：data1.zip、data2.zip、data3.zip",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "extract_archive",
+            "description": "解压压缩文件",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "filename": {"type": "string", "description": "压缩包文件名"},
+                "destination": {"type": "string", "description": "解压目标路径"}
+              },
+              "required": ["filename"]
+            }
+          }
+        }
+      ],
+      "expected": [
+        {"name": "extract_archive", "arguments": {"filename": "data1.zip"}},
+        {"name": "extract_archive", "arguments": {"filename": "data2.zip"}},
+        {"name": "extract_archive", "arguments": {"filename": "data3.zip"}}
+      ],
+      "expected_type": "parallel"
+    },
+    {
+      "id": "parallel-012",
+      "category": "parallel",
+      "query": "同时查一下北京、上海、深圳、杭州、成都五个城市的空气质量指数",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "get_air_quality",
+            "description": "查询城市空气质量指数（AQI）",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "city": {"type": "string", "description": "城市名称"}
+              },
+              "required": ["city"]
+            }
+          }
+        }
+      ],
+      "expected": [
+        {"name": "get_air_quality", "arguments": {"city": "北京"}},
+        {"name": "get_air_quality", "arguments": {"city": "上海"}},
+        {"name": "get_air_quality", "arguments": {"city": "深圳"}},
+        {"name": "get_air_quality", "arguments": {"city": "杭州"}},
+        {"name": "get_air_quality", "arguments": {"city": "成都"}}
+      ],
+      "expected_type": "parallel"
+    },
+    {
+      "id": "parallel-013",
+      "category": "parallel",
+      "query": "把这几段中文都翻译一下，第一段翻成英文，第二段翻成日文，第三段翻成法文",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "translate",
+            "description": "翻译文本",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "text": {"type": "string", "description": "待翻译文本"},
+                "target_language": {"type": "string", "description": "目标语言"}
+              },
+              "required": ["text", "target_language"]
+            }
+          }
+        }
+      ],
+      "expected": [
+        {"name": "translate", "arguments": {"text": "第一段", "target_language": "英文"}},
+        {"name": "translate", "arguments": {"text": "第二段", "target_language": "日文"}},
+        {"name": "translate", "arguments": {"text": "第三段", "target_language": "法文"}}
+      ],
+      "expected_type": "parallel"
+    },
+    {
+      "id": "parallel-014",
+      "category": "parallel",
+      "query": "帮我在微博、知乎、百度热搜上都看一下今天的热搜榜",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "get_trending_topics",
+            "description": "获取热门话题/热搜榜",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "platform": {"type": "string", "enum": ["微博", "知乎", "百度", "抖音"]},
+                "limit": {"type": "integer", "description": "返回条数"}
+              },
+              "required": ["platform"]
+            }
+          }
+        }
+      ],
+      "expected": [
+        {"name": "get_trending_topics", "arguments": {"platform": "微博"}},
+        {"name": "get_trending_topics", "arguments": {"platform": "知乎"}},
+        {"name": "get_trending_topics", "arguments": {"platform": "百度"}}
+      ],
+      "expected_type": "parallel"
+    },
+    {
+      "id": "parallel-015",
+      "category": "parallel",
+      "query": "帮我同时下载这三个文件：report.pdf、data.csv、slides.pptx",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "download_file",
+            "description": "下载文件",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "url": {"type": "string", "description": "文件URL"},
+                "save_as": {"type": "string", "description": "保存文件名"}
+              },
+              "required": ["url"]
+            }
+          }
+        }
+      ],
+      "expected": [
+        {"name": "download_file", "arguments": {"url": "report.pdf"}},
+        {"name": "download_file", "arguments": {"url": "data.csv"}},
+        {"name": "download_file", "arguments": {"url": "slides.pptx"}}
+      ],
+      "expected_type": "parallel"
+    },
+    {
+      "id": "parallel-016",
+      "category": "parallel",
+      "query": "给张三、李四、王五、赵六都发一封同样的会议通知邮件",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "send_email",
+            "description": "发送邮件",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "to": {"type": "string", "description": "收件人姓名或邮箱"},
+                "subject": {"type": "string", "description": "邮件主题"},
+                "body": {"type": "string", "description": "邮件正文"}
+              },
+              "required": ["to", "subject", "body"]
+            }
+          }
+        }
+      ],
+      "expected": [
+        {"name": "send_email", "arguments": {"to": "张三", "subject": "会议通知"}},
+        {"name": "send_email", "arguments": {"to": "李四", "subject": "会议通知"}},
+        {"name": "send_email", "arguments": {"to": "王五", "subject": "会议通知"}},
+        {"name": "send_email", "arguments": {"to": "赵六", "subject": "会议通知"}}
+      ],
+      "expected_type": "parallel"
+    },
+    {
+      "id": "parallel-017",
+      "category": "parallel",
+      "query": "查一下苹果、微软、谷歌、亚马逊、Meta 五家公司的市值",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "get_market_cap",
+            "description": "查询上市公司市值",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "company": {"type": "string", "description": "公司名称"},
+                "currency": {"type": "string", "enum": ["美元", "人民币", "港币"]}
+              },
+              "required": ["company"]
+            }
+          }
+        }
+      ],
+      "expected": [
+        {"name": "get_market_cap", "arguments": {"company": "苹果"}},
+        {"name": "get_market_cap", "arguments": {"company": "微软"}},
+        {"name": "get_market_cap", "arguments": {"company": "谷歌"}},
+        {"name": "get_market_cap", "arguments": {"company": "亚马逊"}},
+        {"name": "get_market_cap", "arguments": {"company": "Meta"}}
+      ],
+      "expected_type": "parallel"
+    },
+    {
+      "id": "parallel-018",
+      "category": "parallel",
+      "query": "帮我把客厅、卧室、书房、厨房、卫生间的灯都关了",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "control_light",
+            "description": "控制智能灯具",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "room": {"type": "string", "description": "房间名称"},
+                "action": {"type": "string", "enum": ["开", "关"]}
+              },
+              "required": ["room", "action"]
+            }
+          }
+        }
+      ],
+      "expected": [
+        {"name": "control_light", "arguments": {"room": "客厅", "action": "关"}},
+        {"name": "control_light", "arguments": {"room": "卧室", "action": "关"}},
+        {"name": "control_light", "arguments": {"room": "书房", "action": "关"}},
+        {"name": "control_light", "arguments": {"room": "厨房", "action": "关"}},
+        {"name": "control_light", "arguments": {"room": "卫生间", "action": "关"}}
+      ],
+      "expected_type": "parallel"
+    },
+    {
+      "id": "parallel-019",
+      "category": "parallel",
+      "query": "把下面这几句话都翻译成中文：'Life is like a box of chocolates'，'To be or not to be'，'I have a dream'",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "translate",
+            "description": "翻译文本",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "text": {"type": "string", "description": "待翻译文本"},
+                "target_language": {"type": "string", "description": "目标语言"}
+              },
+              "required": ["text", "target_language"]
+            }
+          }
+        }
+      ],
+      "expected": [
+        {"name": "translate", "arguments": {"text": "Life is like a box of chocolates", "target_language": "中文"}},
+        {"name": "translate", "arguments": {"text": "To be or not to be", "target_language": "中文"}},
+        {"name": "translate", "arguments": {"text": "I have a dream", "target_language": "中文"}}
+      ],
+      "expected_type": "parallel"
+    },
+    {
+      "id": "parallel-020",
+      "category": "parallel",
+      "query": "帮我在饿了么和美团上都搜一下附近有什么好吃的寿司",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "search_food_delivery",
+            "description": "搜索外卖/美食",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "keyword": {"type": "string", "description": "搜索关键词"},
+                "platform": {"type": "string", "enum": ["饿了么", "美团"]}
+              },
+              "required": ["keyword", "platform"]
+            }
+          }
+        }
+      ],
+      "expected": [
+        {"name": "search_food_delivery", "arguments": {"keyword": "寿司", "platform": "饿了么"}},
+        {"name": "search_food_delivery", "arguments": {"keyword": "寿司", "platform": "美团"}}
+      ],
+      "expected_type": "parallel"
+    },
+
+    {
+      "id": "nested-001",
+      "category": "nested",
+      "query": "帮我设置一个商品筛选条件：价格在 100 到 500 之间，品牌是华为或者小米，评分至少 4 分，按销量排序",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "search_products",
+            "description": "按条件筛选商品",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "filters": {
+                  "type": "object",
+                  "description": "筛选条件",
+                  "properties": {
+                    "price_range": {
+                      "type": "object",
+                      "properties": {
+                        "min": {"type": "number"},
+                        "max": {"type": "number"}
+                      }
+                    },
+                    "brands": {"type": "array", "items": {"type": "string"}},
+                    "min_rating": {"type": "number"},
+                    "sort_by": {"type": "string", "enum": ["价格", "销量", "评分", "新品"]}
+                  }
+                }
+              },
+              "required": ["filters"]
+            }
+          }
+        }
+      ],
+      "expected": {
+        "name": "search_products",
+        "arguments": {
+          "filters": {
+            "price_range": {"min": 100, "max": 500},
+            "brands": ["华为", "小米"],
+            "min_rating": 4,
+            "sort_by": "销量"
+          }
+        }
+      }
+    },
+    {
+      "id": "nested-002",
+      "category": "nested",
+      "query": "帮我配置一个告警规则：当 CPU 使用率超过 90% 并且持续时间超过 5 分钟时，发送邮件通知给 admin@company.com",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "create_alert_rule",
+            "description": "创建监控告警规则",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "rule": {
+                  "type": "object",
+                  "properties": {
+                    "metric": {"type": "string"},
+                    "condition": {
+                      "type": "object",
+                      "properties": {
+                        "operator": {"type": "string", "enum": ["大于", "小于", "等于"]},
+                        "threshold": {"type": "number"},
+                        "duration_seconds": {"type": "integer"}
+                      }
+                    },
+                    "actions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "type": {"type": "string", "enum": ["邮件", "短信", "电话", "Webhook"]},
+                          "target": {"type": "string"}
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "required": ["rule"]
+            }
+          }
+        }
+      ],
+      "expected": {
+        "name": "create_alert_rule",
+        "arguments": {
+          "rule": {
+            "metric": "CPU使用率",
+            "condition": {"operator": "大于", "threshold": 90, "duration_seconds": 300},
+            "actions": [{"type": "邮件", "target": "admin@company.com"}]
+          }
+        }
+      }
+    },
+    {
+      "id": "nested-003",
+      "category": "nested",
+      "query": "帮我新建一个用户：姓名张三，年龄28，地址是一个对象包含省'广东'市'深圳'区'南山'，爱好包括编程和篮球",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "create_user",
+            "description": "创建新用户",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "name": {"type": "string", "description": "姓名"},
+                "age": {"type": "integer", "description": "年龄"},
+                "address": {
+                  "type": "object",
+                  "description": "地址信息",
+                  "properties": {
+                    "province": {"type": "string"},
+                    "city": {"type": "string"},
+                    "district": {"type": "string"}
+                  }
+                },
+                "hobbies": {"type": "array", "items": {"type": "string"}, "description": "兴趣爱好"}
+              },
+              "required": ["name"]
+            }
+          }
+        }
+      ],
+      "expected": {
+        "name": "create_user",
+        "arguments": {
+          "name": "张三",
+          "age": 28,
+          "address": {"province": "广东", "city": "深圳", "district": "南山"},
+          "hobbies": ["编程", "篮球"]
+        }
+      }
+    },
+    {
+      "id": "nested-004",
+      "category": "nested",
+      "query": "生成一份报表配置：数据源是 sales_db，时间范围从 2026-01-01 到 2026-06-01，指标包含收入、成本、利润，按月份和地区两个维度分组",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "generate_report",
+            "description": "生成报表",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "config": {
+                  "type": "object",
+                  "properties": {
+                    "datasource": {"type": "string"},
+                    "date_range": {
+                      "type": "object",
+                      "properties": {
+                        "start": {"type": "string", "format": "date"},
+                        "end": {"type": "string", "format": "date"}
+                      }
+                    },
+                    "metrics": {"type": "array", "items": {"type": "string"}},
+                    "dimensions": {"type": "array", "items": {"type": "string"}}
+                  }
+                }
+              },
+              "required": ["config"]
+            }
+          }
+        }
+      ],
+      "expected": {
+        "name": "generate_report",
+        "arguments": {
+          "config": {
+            "datasource": "sales_db",
+            "date_range": {"start": "2026-01-01", "end": "2026-06-01"},
+            "metrics": ["收入", "成本", "利润"],
+            "dimensions": ["月份", "地区"]
+          }
+        }
+      }
+    },
+    {
+      "id": "nested-005",
+      "category": "nested",
+      "query": "帮我发一个问卷：标题'用户满意度调查'，三个问题——第一个是'您对我们的服务满意吗'类型单选选项有满意/一般/不满意，第二个是'请描述您的建议'类型文本，第三个是'您最常用的功能'类型多选选项有搜索/推荐/购物车/支付",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "create_survey",
+            "description": "创建问卷调查",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "title": {"type": "string", "description": "问卷标题"},
+                "questions": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "text": {"type": "string"},
+                      "type": {"type": "string", "enum": ["单选", "多选", "文本"]},
+                      "options": {"type": "array", "items": {"type": "string"}}
+                    }
+                  }
+                }
+              },
+              "required": ["title", "questions"]
+            }
+          }
+        }
+      ],
+      "expected": {
+        "name": "create_survey",
+        "arguments": {
+          "title": "用户满意度调查",
+          "questions": [
+            {"text": "您对我们的服务满意吗", "type": "单选", "options": ["满意", "一般", "不满意"]},
+            {"text": "请描述您的建议", "type": "文本"},
+            {"text": "您最常用的功能", "type": "多选", "options": ["搜索", "推荐", "购物车", "支付"]}
+          ]
+        }
+      }
+    },
+    {
+      "id": "nested-006",
+      "category": "nested",
+      "query": "帮我配置一个自动化工作流：每天凌晨2点，先从数据库导出昨天的订单数据，然后发给数据团队邮箱data@team.com，最后把导出文件备份到 backup 目录",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "create_workflow",
+            "description": "创建自动化工作流",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "name": {"type": "string", "description": "工作流名称"},
+                "schedule": {"type": "string", "description": "调度时间表达式"},
+                "steps": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "order": {"type": "integer", "description": "执行顺序"},
+                      "action": {"type": "string", "description": "动作类型"},
+                      "params": {"type": "object", "description": "动作参数"}
+                    }
+                  }
+                }
+              },
+              "required": ["name", "schedule", "steps"]
+            }
+          }
+        }
+      ],
+      "expected": {
+        "name": "create_workflow",
+        "arguments": {
+          "name": "每日订单导出",
+          "schedule": "每天 02:00",
+          "steps": [
+            {"order": 1, "action": "export_data", "params": {"source": "数据库", "data_type": "订单", "date_range": "昨天"}},
+            {"order": 2, "action": "send_email", "params": {"to": "data@team.com", "attachment": "导出文件"}},
+            {"order": 3, "action": "backup", "params": {"destination": "backup目录", "source": "导出文件"}}
+          ]
+        }
+      }
+    },
+    {
+      "id": "nested-007",
+      "category": "nested",
+      "query": "帮我设置一个API接口：路径是 /api/users，方法是 POST，请求体需要 username 和 email 两个必填字段和一个可选的 phone 字段，返回格式是 JSON",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "define_api_endpoint",
+            "description": "定义API接口规范",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "path": {"type": "string"},
+                "method": {"type": "string", "enum": ["GET", "POST", "PUT", "DELETE"]},
+                "request_body": {
+                  "type": "object",
+                  "properties": {
+                    "required": {"type": "array", "items": {"type": "string"}},
+                    "optional": {"type": "array", "items": {"type": "string"}},
+                    "properties": {"type": "object"}
+                  }
+                },
+                "response_format": {"type": "string", "enum": ["JSON", "XML", "HTML"]}
+              },
+              "required": ["path", "method"]
+            }
+          }
+        }
+      ],
+      "expected": {
+        "name": "define_api_endpoint",
+        "arguments": {
+          "path": "/api/users",
+          "method": "POST",
+          "request_body": {
+            "required": ["username", "email"],
+            "optional": ["phone"],
+            "properties": {"username": "string", "email": "string", "phone": "string"}
+          },
+          "response_format": "JSON"
+        }
+      }
+    },
+    {
+      "id": "nested-008",
+      "category": "nested",
+      "query": "帮我配置一个邮件模板：收件人用客户的名字，主题是'您的订单已发货'，正文包含订单号、物流单号、预计送达日期三个变量",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "create_email_template",
+            "description": "创建邮件模板",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "template": {
+                  "type": "object",
+                  "properties": {
+                    "name": {"type": "string", "description": "模板名称"},
+                    "subject_template": {"type": "string", "description": "主题模板"},
+                    "variables": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {"type": "string"},
+                          "type": {"type": "string"},
+                          "description": {"type": "string"}
+                        }
+                      }
+                    },
+                    "body_template": {"type": "string", "description": "正文模板"}
+                  }
+                }
+              },
+              "required": ["template"]
+            }
+          }
+        }
+      ],
+      "expected": {
+        "name": "create_email_template",
+        "arguments": {
+          "template": {
+            "name": "发货通知",
+            "subject_template": "您的订单已发货",
+            "variables": [
+              {"name": "customer_name", "type": "string", "description": "客户姓名"},
+              {"name": "order_id", "type": "string", "description": "订单号"},
+              {"name": "tracking_number", "type": "string", "description": "物流单号"},
+              {"name": "estimated_delivery", "type": "date", "description": "预计送达日期"}
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "nested-009",
+      "category": "nested",
+      "query": "帮我创建一个数据库表：表名 users，字段包括 id（整数主键自增）、username（字符串非空唯一）、email（字符串非空）、created_at（时间戳默认当前时间）",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "create_database_table",
+            "description": "创建数据库表",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "table_name": {"type": "string"},
+                "columns": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {"type": "string"},
+                      "type": {"type": "string"},
+                      "primary_key": {"type": "boolean"},
+                      "auto_increment": {"type": "boolean"},
+                      "nullable": {"type": "boolean"},
+                      "unique": {"type": "boolean"},
+                      "default": {"type": "string"}
+                    }
+                  }
+                }
+              },
+              "required": ["table_name", "columns"]
+            }
+          }
+        }
+      ],
+      "expected": {
+        "name": "create_database_table",
+        "arguments": {
+          "table_name": "users",
+          "columns": [
+            {"name": "id", "type": "整数", "primary_key": true, "auto_increment": true},
+            {"name": "username", "type": "字符串", "nullable": false, "unique": true},
+            {"name": "email", "type": "字符串", "nullable": false},
+            {"name": "created_at", "type": "时间戳", "default": "当前时间"}
+          ]
+        }
+      }
+    },
+    {
+      "id": "nested-010",
+      "category": "nested",
+      "query": "帮我配置一个新员工的入职信息：姓名王五，部门技术部，岗位高级工程师，上级是张三，入职日期下周一，办公设备需要笔记本电脑和显示器",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "onboard_employee",
+            "description": "创建员工入职记录",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "employee": {
+                  "type": "object",
+                  "properties": {
+                    "name": {"type": "string"},
+                    "department": {"type": "string"},
+                    "position": {"type": "string"},
+                    "manager": {"type": "string"},
+                    "start_date": {"type": "string"},
+                    "equipment": {"type": "array", "items": {"type": "string"}}
+                  }
+                }
+              },
+              "required": ["employee"]
+            }
+          }
+        }
+      ],
+      "expected": {
+        "name": "onboard_employee",
+        "arguments": {
+          "employee": {
+            "name": "王五",
+            "department": "技术部",
+            "position": "高级工程师",
+            "manager": "张三",
+            "start_date": "下周一",
+            "equipment": ["笔记本电脑", "显示器"]
+          }
+        }
+      }
+    },
+    {
+      "id": "nested-011",
+      "category": "nested",
+      "query": "帮我设置一个复杂的搜索条件：标题包含'AI'，发布时间在最近一个月，作者来自清华或北大，且至少有 10 个引用，按引用数降序排列",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "search_papers",
+            "description": "搜索学术论文",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "query": {
+                  "type": "object",
+                  "properties": {
+                    "title_contains": {"type": "string"},
+                    "date_range": {
+                      "type": "object",
+                      "properties": {
+                        "from": {"type": "string"},
+                        "to": {"type": "string"}
+                      }
+                    },
+                    "authors_affiliation": {"type": "array", "items": {"type": "string"}},
+                    "min_citations": {"type": "integer"},
+                    "sort": {
+                      "type": "object",
+                      "properties": {
+                        "field": {"type": "string"},
+                        "order": {"type": "string", "enum": ["asc", "desc"]}
+                      }
+                    }
+                  }
+                }
+              },
+              "required": ["query"]
+            }
+          }
+        }
+      ],
+      "expected": {
+        "name": "search_papers",
+        "arguments": {
+          "query": {
+            "title_contains": "AI",
+            "date_range": {"from": "一个月前", "to": "今天"},
+            "authors_affiliation": ["清华", "北大"],
+            "min_citations": 10,
+            "sort": {"field": "引用数", "order": "desc"}
+          }
+        }
+      }
+    },
+    {
+      "id": "nested-012",
+      "category": "nested",
+      "query": "帮我配置一个 CI/CD 流水线：第一步 checkout 代码，第二步 npm install，第三步 npm test，如果测试通过就 npm run build 然后 docker build 然后 docker push 到 registry.example.com/myapp",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "create_pipeline",
+            "description": "创建CI/CD流水线配置",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "pipeline": {
+                  "type": "object",
+                  "properties": {
+                    "name": {"type": "string"},
+                    "stages": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {"type": "string"},
+                          "commands": {"type": "array", "items": {"type": "string"}},
+                          "condition": {"type": "string", "description": "执行条件"}
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "required": ["pipeline"]
+            }
+          }
+        }
+      ],
+      "expected": {
+        "name": "create_pipeline",
+        "arguments": {
+          "pipeline": {
+            "name": "CI/CD流水线",
+            "stages": [
+              {"name": "checkout", "commands": ["git checkout"]},
+              {"name": "install", "commands": ["npm install"]},
+              {"name": "test", "commands": ["npm test"]},
+              {"name": "build", "commands": ["npm run build"], "condition": "测试通过"},
+              {"name": "docker_build", "commands": ["docker build -t myapp ."]},
+              {"name": "docker_push", "commands": ["docker push registry.example.com/myapp"]}
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "nested-013",
+      "category": "nested",
+      "query": "帮我定义一个订单的 JSON Schema：订单号是字符串必填，商品列表是个数组每个元素包含商品ID和数量，收货地址是个对象包含省市区详细地址和手机号，总金额是数字必填",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "define_schema",
+            "description": "定义数据结构的 JSON Schema",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "schema_name": {"type": "string"},
+                "properties": {
+                  "type": "object",
+                  "description": "字段定义",
+                  "additionalProperties": {
+                    "type": "object",
+                    "properties": {
+                      "type": {"type": "string"},
+                      "required": {"type": "boolean"},
+                      "items": {"type": "object"},
+                      "properties": {"type": "object"}
+                    }
+                  }
+                }
+              },
+              "required": ["schema_name", "properties"]
+            }
+          }
+        }
+      ],
+      "expected": {
+        "name": "define_schema",
+        "arguments": {
+          "schema_name": "订单",
+          "properties": {
+            "order_id": {"type": "string", "required": true},
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "product_id": {"type": "string"},
+                  "quantity": {"type": "integer"}
+                }
+              }
+            },
+            "shipping_address": {
+              "type": "object",
+              "properties": {
+                "province": {"type": "string"},
+                "city": {"type": "string"},
+                "district": {"type": "string"},
+                "detail": {"type": "string"},
+                "phone": {"type": "string"}
+              }
+            },
+            "total_amount": {"type": "number", "required": true}
+          }
+        }
+      }
+    },
+    {
+      "id": "nested-014",
+      "category": "nested",
+      "query": "帮我创建一个数据分析任务：数据源 MySQL 的 sales 表，要做的分析包括描述性统计、趋势分析（按周）、异常检测（用 3-sigma 方法），输出格式是 PDF 报告和 Excel 表格",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "create_analysis_task",
+            "description": "创建数据分析任务",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "task": {
+                  "type": "object",
+                  "properties": {
+                    "datasource": {
+                      "type": "object",
+                      "properties": {
+                        "type": {"type": "string", "enum": ["MySQL", "PostgreSQL", "CSV", "Excel"]},
+                        "table": {"type": "string"}
+                      }
+                    },
+                    "analyses": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "type": {"type": "string"},
+                          "params": {"type": "object"}
+                        }
+                      }
+                    },
+                    "output_formats": {"type": "array", "items": {"type": "string", "enum": ["PDF", "Excel", "CSV", "HTML"]}}
+                  }
+                }
+              },
+              "required": ["task"]
+            }
+          }
+        }
+      ],
+      "expected": {
+        "name": "create_analysis_task",
+        "arguments": {
+          "task": {
+            "datasource": {"type": "MySQL", "table": "sales"},
+            "analyses": [
+              {"type": "descriptive_stats", "params": {}},
+              {"type": "trend_analysis", "params": {"granularity": "周"}},
+              {"type": "anomaly_detection", "params": {"method": "3-sigma"}}
+            ],
+            "output_formats": ["PDF", "Excel"]
+          }
+        }
+      }
+    },
+    {
+      "id": "nested-015",
+      "category": "nested",
+      "query": "帮我设置一个权限策略：角色'编辑者'可以对文章模块进行读取和写入，对评论模块只能读取，但不能访问用户管理模块",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "create_permission_policy",
+            "description": "创建权限策略",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "role_name": {"type": "string"},
+                "permissions": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "module": {"type": "string"},
+                      "actions": {"type": "array", "items": {"type": "string", "enum": ["读取", "写入", "删除", "管理"]}},
+                      "effect": {"type": "string", "enum": ["允许", "拒绝"]}
+                    }
+                  }
+                }
+              },
+              "required": ["role_name", "permissions"]
+            }
+          }
+        }
+      ],
+      "expected": {
+        "name": "create_permission_policy",
+        "arguments": {
+          "role_name": "编辑者",
+          "permissions": [
+            {"module": "文章", "actions": ["读取", "写入"], "effect": "允许"},
+            {"module": "评论", "actions": ["读取"], "effect": "允许"},
+            {"module": "用户管理", "actions": [], "effect": "拒绝"}
+          ]
+        }
+      }
+    },
+    {
+      "id": "nested-016",
+      "category": "nested",
+      "query": "帮我配置一个 A/B 测试：名称'首页按钮颜色测试'，流量分配为对照组 50% 实验组 50%，实验组把按钮颜色从蓝色改成橙色，核心指标是点击率，运行两周",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "create_ab_test",
+            "description": "创建A/B测试配置",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "experiment": {
+                  "type": "object",
+                  "properties": {
+                    "name": {"type": "string"},
+                    "variants": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {"type": "string"},
+                          "traffic_percent": {"type": "number"},
+                          "config": {"type": "object"}
+                        }
+                      }
+                    },
+                    "metrics": {"type": "array", "items": {"type": "string"}},
+                    "duration": {"type": "string"}
+                  }
+                }
+              },
+              "required": ["experiment"]
+            }
+          }
+        }
+      ],
+      "expected": {
+        "name": "create_ab_test",
+        "arguments": {
+          "experiment": {
+            "name": "首页按钮颜色测试",
+            "variants": [
+              {"name": "对照组", "traffic_percent": 50, "config": {"button_color": "蓝色"}},
+              {"name": "实验组", "traffic_percent": 50, "config": {"button_color": "橙色"}}
+            ],
+            "metrics": ["点击率"],
+            "duration": "两周"
+          }
+        }
+      }
+    },
+    {
+      "id": "nested-017",
+      "category": "nested",
+      "query": "帮我创建一个 Kubernetes Deployment：名称 myapp，副本数 3，镜像 nginx:latest，暴露端口 80，环境变量包含 DB_HOST=mysql.default 和 DB_PORT=3306，CPU 限制 500m 内存限制 256Mi",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "create_k8s_deployment",
+            "description": "创建Kubernetes Deployment配置",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "deployment": {
+                  "type": "object",
+                  "properties": {
+                    "name": {"type": "string"},
+                    "replicas": {"type": "integer"},
+                    "container": {
+                      "type": "object",
+                      "properties": {
+                        "image": {"type": "string"},
+                        "port": {"type": "integer"},
+                        "env": {"type": "object", "additionalProperties": {"type": "string"}},
+                        "resources": {
+                          "type": "object",
+                          "properties": {
+                            "cpu_limit": {"type": "string"},
+                            "memory_limit": {"type": "string"}
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "required": ["deployment"]
+            }
+          }
+        }
+      ],
+      "expected": {
+        "name": "create_k8s_deployment",
+        "arguments": {
+          "deployment": {
+            "name": "myapp",
+            "replicas": 3,
+            "container": {
+              "image": "nginx:latest",
+              "port": 80,
+              "env": {"DB_HOST": "mysql.default", "DB_PORT": "3306"},
+              "resources": {"cpu_limit": "500m", "memory_limit": "256Mi"}
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "nested-018",
+      "category": "nested",
+      "query": "帮我定义一个复杂的转账操作：从我的储蓄卡转 5000 块到我的信用卡，转账备注'还款'，如果储蓄卡余额不足就从工资卡补足差额，单日限额 10000",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "complex_transfer",
+            "description": "执行复杂转账操作",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "transfer": {
+                  "type": "object",
+                  "properties": {
+                    "from_account": {"type": "string"},
+                    "to_account": {"type": "string"},
+                    "amount": {"type": "number"},
+                    "note": {"type": "string"},
+                    "fallback": {
+                      "type": "object",
+                      "properties": {
+                        "from_account": {"type": "string"},
+                        "condition": {"type": "string"}
+                      }
+                    },
+                    "constraints": {
+                      "type": "object",
+                      "properties": {
+                        "daily_limit": {"type": "number"}
+                      }
+                    }
+                  }
+                }
+              },
+              "required": ["transfer"]
+            }
+          }
+        }
+      ],
+      "expected": {
+        "name": "complex_transfer",
+        "arguments": {
+          "transfer": {
+            "from_account": "储蓄卡",
+            "to_account": "信用卡",
+            "amount": 5000,
+            "note": "还款",
+            "fallback": {"from_account": "工资卡", "condition": "储蓄卡余额不足"},
+            "constraints": {"daily_limit": 10000}
+          }
+        }
+      }
+    },
+    {
+      "id": "nested-019",
+      "category": "nested",
+      "query": "帮我配置一个物联网设备的数据采集规则：设备类型是温度传感器，采集频率为每 5 分钟一次，数据字段包含温度、湿度、电池电量，当温度超过 40 度时立即上报告警，正常数据每 1 小时批量上传一次",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "configure_iot_device",
+            "description": "配置物联网设备数据采集规则",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "device_config": {
+                  "type": "object",
+                  "properties": {
+                    "device_type": {"type": "string"},
+                    "collection": {
+                      "type": "object",
+                      "properties": {
+                        "interval_minutes": {"type": "integer"},
+                        "fields": {"type": "array", "items": {"type": "string"}}
+                      }
+                    },
+                    "alert_rules": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {"type": "string"},
+                          "condition": {"type": "string"},
+                          "threshold": {"type": "number"},
+                          "action": {"type": "string"}
+                        }
+                      }
+                    },
+                    "upload_policy": {
+                      "type": "object",
+                      "properties": {
+                        "mode": {"type": "string", "enum": ["实时", "批量"]},
+                        "batch_interval_hours": {"type": "number"}
+                      }
+                    }
+                  }
+                }
+              },
+              "required": ["device_config"]
+            }
+          }
+        }
+      ],
+      "expected": {
+        "name": "configure_iot_device",
+        "arguments": {
+          "device_config": {
+            "device_type": "温度传感器",
+            "collection": {"interval_minutes": 5, "fields": ["温度", "湿度", "电池电量"]},
+            "alert_rules": [
+              {"field": "温度", "condition": "大于", "threshold": 40, "action": "立即上报告警"}
+            ],
+            "upload_policy": {"mode": "批量", "batch_interval_hours": 1}
+          }
+        }
+      }
+    },
+    {
+      "id": "nested-020",
+      "category": "nested",
+      "query": "帮我配置一个推荐系统的参数：召回阶段用协同过滤取 top200 和向量召回取 top100，排序阶段用精排模型 v3，重排阶段做多样性打散（类目多样性系数 0.3），最终返回 top20",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "configure_recommendation",
+            "description": "配置推荐系统参数",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "pipeline": {
+                  "type": "object",
+                  "properties": {
+                    "recall": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "method": {"type": "string"},
+                          "top_k": {"type": "integer"}
+                        }
+                      }
+                    },
+                    "ranking": {
+                      "type": "object",
+                      "properties": {
+                        "model": {"type": "string"},
+                        "version": {"type": "string"}
+                      }
+                    },
+                    "rerank": {
+                      "type": "object",
+                      "properties": {
+                        "strategy": {"type": "string"},
+                        "params": {"type": "object"}
+                      }
+                    },
+                    "final_top_k": {"type": "integer"}
+                  }
+                }
+              },
+              "required": ["pipeline"]
+            }
+          }
+        }
+      ],
+      "expected": {
+        "name": "configure_recommendation",
+        "arguments": {
+          "pipeline": {
+            "recall": [
+              {"method": "协同过滤", "top_k": 200},
+              {"method": "向量召回", "top_k": 100}
+            ],
+            "ranking": {"model": "精排模型", "version": "v3"},
+            "rerank": {"strategy": "多样性打散", "params": {"类目多样性系数": 0.3}},
+            "final_top_k": 20
+          }
+        }
+      }
+    },
+
+    {
+      "id": "select-001",
+      "category": "tool_selection",
+      "query": "帮我给张三发个消息",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "send_wechat",
+            "description": "通过微信发送消息",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "contact": {"type": "string", "description": "联系人"},
+                "message": {"type": "string", "description": "消息内容"}
+              },
+              "required": ["contact", "message"]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "send_sms",
+            "description": "通过短信发送消息",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "phone": {"type": "string", "description": "手机号"},
+                "content": {"type": "string", "description": "短信内容"}
+              },
+              "required": ["phone", "content"]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "send_email",
+            "description": "通过邮件发送消息",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "to": {"type": "string", "description": "收件人邮箱"},
+                "subject": {"type": "string", "description": "主题"},
+                "body": {"type": "string", "description": "正文"}
+              },
+              "required": ["to", "subject", "body"]
+            }
+          }
+        }
+      ],
+      "expected": {"name": "send_wechat", "arguments": {"contact": "张三", "message": "消息"}}
+    },
+    {
+      "id": "select-002",
+      "category": "tool_selection",
+      "query": "我要退款，帮我把 order_12345 这个订单退了",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "refund_order",
+            "description": "为订单办理退款",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "order_id": {"type": "string", "description": "订单ID"},
+                "reason": {"type": "string", "description": "退款原因"}
+              },
+              "required": ["order_id"]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "return_order",
+            "description": "为订单办理退货退款（商品需寄回）",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "order_id": {"type": "string", "description": "订单ID"},
+                "return_reason": {"type": "string", "description": "退货原因"},
+                "pickup_address": {"type": "string", "description": "取件地址"}
+              },
+              "required": ["order_id", "pickup_address"]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "exchange_order",
+            "description": "为订单办理换货",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "order_id": {"type": "string", "description": "订单ID"},
+                "new_product_id": {"type": "string", "description": "要换的商品ID"}
+              },
+              "required": ["order_id", "new_product_id"]
+            }
+          }
+        }
+      ],
+      "expected": {"name": "refund_order", "arguments": {"order_id": "order_12345"}}
+    },
+    {
+      "id": "select-003",
+      "category": "tool_selection",
+      "query": "帮我查一下这篇论文被引用了多少次：Attention Is All You Need",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "search_papers",
+            "description": "搜索学术论文的基本信息，包括标题、作者、摘要",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "title": {"type": "string", "description": "论文标题"},
+                "author": {"type": "string", "description": "作者"}
+              }
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "get_citation_count",
+            "description": "查询论文的被引用次数",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "paper_title": {"type": "string", "description": "论文标题"},
+                "paper_id": {"type": "string", "description": "论文ID（DOI等）"}
+              }
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "get_full_text",
+            "description": "获取论文全文",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "paper_id": {"type": "string", "description": "论文ID"}
+              },
+              "required": ["paper_id"]
+            }
+          }
+        }
+      ],
+      "expected": {"name": "get_citation_count", "arguments": {"paper_title": "Attention Is All You Need"}}
+    },
+    {
+      "id": "select-004",
+      "category": "tool_selection",
+      "query": "帮我把这张图里的表格提取出来存成 CSV 文件：report_table.png",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "ocr_image",
+            "description": "识别图片中的文字，返回纯文本",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "image_url": {"type": "string", "description": "图片路径"}
+              },
+              "required": ["image_url"]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "extract_table_from_image",
+            "description": "从图片中提取表格并导出为结构化数据",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "image_path": {"type": "string", "description": "图片路径"},
+                "output_format": {"type": "string", "enum": ["CSV", "Excel", "JSON"]}
+              },
+              "required": ["image_path", "output_format"]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "edit_image",
+            "description": "编辑图片（裁剪、旋转、调整颜色等）",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "image_path": {"type": "string"},
+                "operation": {"type": "string", "enum": ["裁剪", "旋转", "调色", "压缩"]}
+              },
+              "required": ["image_path", "operation"]
+            }
+          }
+        }
+      ],
+      "expected": {"name": "extract_table_from_image", "arguments": {"image_path": "report_table.png", "output_format": "CSV"}}
+    },
+    {
+      "id": "select-005",
+      "category": "tool_selection",
+      "query": "你看能不能帮我查一下明天去杭州还有没有票",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "search_flights",
+            "description": "搜索机票",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "departure": {"type": "string"},
+                "destination": {"type": "string"},
+                "date": {"type": "string"}
+              },
+              "required": ["departure", "destination", "date"]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "search_trains",
+            "description": "搜索火车票/高铁票",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "from": {"type": "string"},
+                "to": {"type": "string"},
+                "date": {"type": "string"}
+              },
+              "required": ["from", "to", "date"]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "search_buses",
+            "description": "搜索长途汽车票",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "departure_city": {"type": "string"},
+                "arrival_city": {"type": "string"},
+                "date": {"type": "string"}
+              },
+              "required": ["departure_city", "arrival_city", "date"]
+            }
+          }
+        }
+      ],
+      "expected": {"name": "search_trains", "arguments": {"from": "北京", "to": "杭州", "date": "明天"}}
+    },
+    {
+      "id": "select-006",
+      "category": "tool_selection",
+      "query": "帮我叫个车去中关村",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "hail_ride",
+            "description": "呼叫网约车（滴滴、高德等）",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "destination": {"type": "string"},
+                "service_type": {"type": "string", "enum": ["快车", "专车", "拼车", "顺风车"]}
+              },
+              "required": ["destination"]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "call_taxi_phone",
+            "description": "通过电话叫出租车",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "pickup_location": {"type": "string"},
+                "phone_number": {"type": "string"}
+              },
+              "required": ["pickup_location"]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "rent_car",
+            "description": "租车服务",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "car_type": {"type": "string"},
+                "duration_hours": {"type": "integer"},
+                "pickup_location": {"type": "string"}
+              },
+              "required": ["car_type", "duration_hours"]
+            }
+          }
+        }
+      ],
+      "expected": {"name": "hail_ride", "arguments": {"destination": "中关村"}}
+    },
+    {
+      "id": "select-007",
+      "category": "tool_selection",
+      "query": "这个文档帮我翻一下，从中文翻成英文：商业计划书_v3.docx",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "translate_text",
+            "description": "翻译纯文本内容",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "text": {"type": "string", "description": "待翻译的文本"},
+                "source_lang": {"type": "string"},
+                "target_lang": {"type": "string"}
+              },
+              "required": ["text", "target_lang"]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "translate_document",
+            "description": "翻译整个文档文件，保留原格式",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "file_path": {"type": "string", "description": "文档文件路径"},
+                "source_lang": {"type": "string"},
+                "target_lang": {"type": "string"},
+                "keep_formatting": {"type": "boolean"}
+              },
+              "required": ["file_path", "target_lang"]
+            }
+          }
+        }
+      ],
+      "expected": {"name": "translate_document", "arguments": {"file_path": "商业计划书_v3.docx", "source_lang": "中文", "target_lang": "英文", "keep_formatting": true}}
+    },
+    {
+      "id": "select-008",
+      "category": "tool_selection",
+      "query": "帮我查一下我们数据库里上个月新增了多少用户",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "query_database",
+            "description": "执行 SQL 查询",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "sql": {"type": "string", "description": "SQL 查询语句"},
+                "database": {"type": "string", "description": "数据库名称"}
+              },
+              "required": ["sql"]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "get_analytics_metric",
+            "description": "从数据分析平台获取预计算的指标",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "metric_name": {"type": "string", "description": "指标名称，如'新增用户数'"},
+                "period": {"type": "string", "description": "时间范围"}
+              },
+              "required": ["metric_name", "period"]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "export_table",
+            "description": "导出数据库表为文件",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "table_name": {"type": "string"},
+                "format": {"type": "string", "enum": ["CSV", "Excel", "JSON"]}
+              },
+              "required": ["table_name"]
+            }
+          }
+        }
+      ],
+      "expected": {"name": "get_analytics_metric", "arguments": {"metric_name": "新增用户数", "period": "上个月"}}
+    },
+    {
+      "id": "select-009",
+      "category": "tool_selection",
+      "query": "帮我把这个 GitHub 仓库克隆到本地：https://github.com/example/myproject",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "git_clone",
+            "description": "克隆 Git 仓库到本地",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "repo_url": {"type": "string"},
+                "destination": {"type": "string", "description": "本地目标路径"},
+                "branch": {"type": "string", "description": "指定分支"}
+              },
+              "required": ["repo_url"]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "download_file",
+            "description": "下载单个文件",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "url": {"type": "string"},
+                "save_as": {"type": "string"}
+              },
+              "required": ["url"]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "browse_github",
+            "description": "浏览 GitHub 仓库的文件结构和内容",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "repo_url": {"type": "string"},
+                "path": {"type": "string", "description": "仓库内路径"}
+              },
+              "required": ["repo_url"]
+            }
+          }
+        }
+      ],
+      "expected": {"name": "git_clone", "arguments": {"repo_url": "https://github.com/example/myproject"}}
+    },
+    {
+      "id": "select-010",
+      "category": "tool_selection",
+      "query": "帮我查一下这个人在不在我们的客户名单里：张伟，13812345678",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "search_by_name",
+            "description": "按姓名在客户数据库中搜索",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "name": {"type": "string", "description": "客户姓名"}
+              },
+              "required": ["name"]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "search_by_phone",
+            "description": "按手机号在客户数据库中搜索",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "phone": {"type": "string", "description": "手机号码"}
+              },
+              "required": ["phone"]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "search_by_both",
+            "description": "按姓名和手机号联合搜索",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "name": {"type": "string"},
+                "phone": {"type": "string"}
+              },
+              "required": ["name", "phone"]
+            }
+          }
+        }
+      ],
+      "expected": {"name": "search_by_both", "arguments": {"name": "张伟", "phone": "13812345678"}}
+    },
+    {
+      "id": "select-011",
+      "category": "tool_selection",
+      "query": "把这段音频转成文字：meeting_20260601.mp3",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "transcribe_audio",
+            "description": "将音频文件转写为文字（语音转文本）",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "audio_path": {"type": "string", "description": "音频文件路径"},
+                "language": {"type": "string", "description": "音频语言"},
+                "speaker_diarization": {"type": "boolean", "description": "是否区分说话人"}
+              },
+              "required": ["audio_path"]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "translate_audio",
+            "description": "将音频内容翻译成另一种语言，返回翻译文本",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "audio_path": {"type": "string"},
+                "target_language": {"type": "string"}
+              },
+              "required": ["audio_path", "target_language"]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "extract_audio_from_video",
+            "description": "从视频文件中提取音频轨道",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "video_path": {"type": "string"},
+                "output_format": {"type": "string", "enum": ["mp3", "wav"]}
+              },
+              "required": ["video_path"]
+            }
+          }
+        }
+      ],
+      "expected": {"name": "transcribe_audio", "arguments": {"audio_path": "meeting_20260601.mp3"}}
+    },
+    {
+      "id": "select-012",
+      "category": "tool_selection",
+      "query": "帮我在服务器上把这个进程杀掉，它占了太多内存",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "list_processes",
+            "description": "列出服务器上运行的进程",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "sort_by": {"type": "string", "enum": ["CPU", "内存", "PID"]},
+                "limit": {"type": "integer"}
+              }
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "kill_process",
+            "description": "终止指定进程",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "pid": {"type": "integer", "description": "进程ID"},
+                "signal": {"type": "string", "enum": ["TERM", "KILL"]}
+              },
+              "required": ["pid"]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "restart_service",
+            "description": "重启系统服务",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "service_name": {"type": "string"}
+              },
+              "required": ["service_name"]
+            }
+          }
+        }
+      ],
+      "expected": {"name": "list_processes", "arguments": {"sort_by": "内存", "limit": 10}}
+    },
+    {
+      "id": "select-013",
+      "category": "tool_selection",
+      "query": "帮我找一下上个月销售额最高的那个产品是什么",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "get_sales_report",
+            "description": "获取预生成的销售报表",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "period": {"type": "string", "description": "时间范围"},
+                "metric": {"type": "string", "enum": ["销售额", "订单数", "利润"]}
+              },
+              "required": ["period"]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "query_sales_data",
+            "description": "查询原始销售数据（灵活但需要写 SQL）",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "sql": {"type": "string", "description": "SQL 查询语句"}
+              },
+              "required": ["sql"]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "get_top_products",
+            "description": "直接获取销售额排名前列的产品",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "period": {"type": "string", "description": "时间范围"},
+                "rank_by": {"type": "string", "enum": ["销售额", "销量", "利润"]},
+                "top_n": {"type": "integer", "description": "返回前几名"}
+              },
+              "required": ["period", "rank_by"]
+            }
+          }
+        }
+      ],
+      "expected": {"name": "get_top_products", "arguments": {"period": "上个月", "rank_by": "销售额", "top_n": 1}}
+    },
+    {
+      "id": "select-014",
+      "category": "tool_selection",
+      "query": "帮我看一下这个合同合不合规：合作框架协议_v2.pdf",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "extract_text_from_pdf",
+            "description": "从 PDF 文件中提取纯文本",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "file_path": {"type": "string"},
+                "pages": {"type": "string", "description": "指定页码，如'1-10'"}
+              },
+              "required": ["file_path"]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "review_contract",
+            "description": "审查合同内容，检查合规风险和条款问题",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "file_path": {"type": "string", "description": "合同文件路径"},
+                "jurisdiction": {"type": "string", "description": "适用法律地区"},
+                "focus_areas": {"type": "array", "items": {"type": "string"}, "description": "重点关注领域"}
+              },
+              "required": ["file_path"]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "translate_document",
+            "description": "翻译文档",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "file_path": {"type": "string"},
+                "target_lang": {"type": "string"}
+              },
+              "required": ["file_path", "target_lang"]
+            }
+          }
+        }
+      ],
+      "expected": {"name": "review_contract", "arguments": {"file_path": "合作框架协议_v2.pdf"}}
+    },
+    {
+      "id": "select-015",
+      "category": "tool_selection",
+      "query": "帮我把昨天的销售数据导出来，我要用 Excel 打开看",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "export_data_to_file",
+            "description": "导出数据为文件格式",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "data_source": {"type": "string", "description": "数据来源"},
+                "format": {"type": "string", "enum": ["CSV", "Excel", "JSON", "PDF"]},
+                "date_range": {"type": "string", "description": "日期范围"},
+                "file_name": {"type": "string", "description": "输出文件名"}
+              },
+              "required": ["data_source", "format"]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "create_dashboard",
+            "description": "创建交互式数据仪表盘（网页版）",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "data_source": {"type": "string"},
+                "charts": {"type": "array", "items": {"type": "string"}}
+              },
+              "required": ["data_source", "charts"]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "share_data_link",
+            "description": "生成数据共享链接，可在线查看",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "data_source": {"type": "string"},
+                "expire_days": {"type": "integer", "description": "链接有效天数"}
+              },
+              "required": ["data_source"]
+            }
+          }
+        }
+      ],
+      "expected": {"name": "export_data_to_file", "arguments": {"data_source": "销售数据", "format": "Excel", "date_range": "昨天", "file_name": "昨日销售数据"}}
+    },
+    {
+      "id": "select-016",
+      "category": "tool_selection",
+      "query": "帮我盯着这个商品的价格，降到 200 块以下就告诉我",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "check_price",
+            "description": "查询商品当前价格",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "product_url": {"type": "string"},
+                "product_name": {"type": "string"}
+              }
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "set_price_alert",
+            "description": "设置商品降价提醒，价格满足条件时自动通知",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "product_name": {"type": "string", "description": "商品名称"},
+                "target_price": {"type": "number", "description": "目标价格"},
+                "condition": {"type": "string", "enum": ["低于", "等于", "任意降价"]},
+                "notify_method": {"type": "string", "enum": ["App推送", "短信", "邮件"]}
+              },
+              "required": ["product_name", "target_price", "condition"]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "buy_now",
+            "description": "立即下单购买商品",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "product_name": {"type": "string"},
+                "quantity": {"type": "integer"}
+              },
+              "required": ["product_name"]
+            }
+          }
+        }
+      ],
+      "expected": {"name": "set_price_alert", "arguments": {"product_name": "这个商品", "target_price": 200, "condition": "低于", "notify_method": "App推送"}}
+    },
+    {
+      "id": "select-017",
+      "category": "tool_selection",
+      "query": "那个啥，帮我看看附近有没有什么好玩的",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "search_attractions",
+            "description": "搜索旅游景点",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "city": {"type": "string", "description": "城市名称"},
+                "type": {"type": "string", "enum": ["自然风光", "人文历史", "主题乐园", "购物美食"]},
+                "radius_km": {"type": "integer"}
+              }
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "search_events_nearby",
+            "description": "搜索附近正在举办的活动",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "date": {"type": "string", "description": "日期"},
+                "category": {"type": "string", "enum": ["演出", "展览", "运动", "市集"]}
+              }
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "get_travel_guide",
+            "description": "获取某地的完整旅游攻略",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "destination": {"type": "string"},
+                "days": {"type": "integer", "description": "行程天数"},
+                "style": {"type": "string", "enum": ["紧凑", "休闲", "亲子", "情侣"]}
+              },
+              "required": ["destination", "days"]
+            }
+          }
+        }
+      ],
+      "expected": {"name": "search_attractions", "arguments": {"city": "北京"}}
+    },
+    {
+      "id": "select-018",
+      "category": "tool_selection",
+      "query": "帮我搞一下这个数据集，做个特征工程：customer_data.csv",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "load_dataset",
+            "description": "加载数据文件",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "file_path": {"type": "string"},
+                "format": {"type": "string", "enum": ["CSV", "Excel", "JSON", "Parquet"]}
+              },
+              "required": ["file_path"]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "feature_engineering",
+            "description": "对数据集进行特征工程处理",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "file_path": {"type": "string", "description": "数据文件路径"},
+                "operations": {"type": "array", "items": {"type": "string", "enum": ["缺失值填充", "标准化", "OneHot编码", "特征交叉", "降维", "异常值处理"]}},
+                "target_column": {"type": "string", "description": "目标变量列名"},
+                "output_file": {"type": "string", "description": "输出文件路径"}
+              },
+              "required": ["file_path"]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "describe_dataset",
+            "description": "对数据集进行描述性统计分析",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "file_path": {"type": "string"},
+                "include_plots": {"type": "boolean"}
+              },
+              "required": ["file_path"]
+            }
+          }
+        }
+      ],
+      "expected": {"name": "feature_engineering", "arguments": {"file_path": "customer_data.csv"}}
+    },
+    {
+      "id": "select-019",
+      "category": "tool_selection",
+      "query": "帮我在这个代码仓库里找一下有没有处理用户登录相关的代码",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "search_code",
+            "description": "在代码仓库中搜索关键词",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "query": {"type": "string", "description": "搜索关键词"},
+                "file_types": {"type": "array", "items": {"type": "string"}, "description": "限定文件类型"},
+                "repo_path": {"type": "string", "description": "仓库路径"}
+              },
+              "required": ["query"]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "search_git_history",
+            "description": "搜索 Git 提交历史",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "keyword": {"type": "string", "description": "提交信息关键词"},
+                "author": {"type": "string", "description": "提交者"},
+                "since": {"type": "string", "description": "起始日期"}
+              },
+              "required": ["keyword"]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "list_project_structure",
+            "description": "列出项目的目录结构和文件组织",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "repo_path": {"type": "string"},
+                "depth": {"type": "integer", "description": "目录深度"}
+              },
+              "required": ["repo_path"]
+            }
+          }
+        }
+      ],
+      "expected": {"name": "search_code", "arguments": {"query": "用户登录", "repo_path": "这个代码仓库"}}
+    },
+    {
+      "id": "select-020",
+      "category": "tool_selection",
+      "query": "麻烦您帮我把这些照片压缩一下再发到群里，大概有 20 张左右",
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "compress_images",
+            "description": "批量压缩图片文件大小",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "file_paths": {"type": "array", "items": {"type": "string"}, "description": "图片文件路径列表"},
+                "quality": {"type": "integer", "minimum": 1, "maximum": 100, "description": "压缩质量"},
+                "max_size_kb": {"type": "integer", "description": "单张图片最大体积（KB）"}
+              },
+              "required": ["file_paths"]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "send_to_group",
+            "description": "发送消息或文件到群聊",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "group_name": {"type": "string", "description": "群聊名称"},
+                "platform": {"type": "string", "enum": ["微信", "钉钉", "飞书"]},
+                "files": {"type": "array", "items": {"type": "string"}, "description": "文件路径列表"},
+                "message": {"type": "string", "description": "附带消息"}
+              },
+              "required": ["group_name", "files"]
+            }
+          }
+        },
+        {
+          "type": "function",
+          "function": {
+            "name": "batch_edit_images",
+            "description": "批量编辑图片（裁剪、调色、加水印等）",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "file_paths": {"type": "array", "items": {"type": "string"}},
+                "operations": {"type": "array", "items": {"type": "string"}}
+              },
+              "required": ["file_paths", "operations"]
+            }
+          }
+        }
+      ],
+      "expected": {"name": "compress_images", "arguments": {"file_paths": ["照片"]}}
+    }
+  ]
+}
